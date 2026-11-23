@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {
+      "id": "n1",
+      "title": "TCP",
+      "summary": "可靠传输协议",
+      "category": "计算机网络",
+      "kind": "knowledge",
+      "mastery": 60,
+      "sourceRefs": [
+        {
+          "documentId": "d1",
+          "chunkId": "c1",
+          "page": 3,
+          "snippet": "TCP 提供面向连接的可靠字节流服务。"
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "n2",
+      "title": "传输层",
+      "summary": "端到端通信",
+      "category": "计算机网络",
+      "kind": "knowledge",
+      "mastery": 40,
+      "sourceRefs": [],
+      "createdAt": "2026-01-01T00:00:00Z"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "n1",
+      "target": "n2",
+      "relation": "属于"
+    }
+  ],
+  "graphVersion": 1
+}

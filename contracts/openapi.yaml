@@ -1,0 +1,1093 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NeuroVerse shared API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions": {
+      "post": {
+        "operationId": "createSession",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/graph": {
+      "get": {
+        "operationId": "getGraph",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Graph"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/imports": {
+      "post": {
+        "operationId": "createImport",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportJob"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "TXT or text PDF, up to 10 MB; text up to 50,000 characters. Reuse successful job for identical content and owner.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50000
+                  }
+                },
+                "oneOf": [
+                  {
+                    "required": [
+                      "file"
+                    ],
+                    "not": {
+                      "required": [
+                        "text"
+                      ]
+                    }
+                  },
+                  {
+                    "required": [
+                      "text"
+                    ],
+                    "not": {
+                      "required": [
+                        "file"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{id}": {
+      "get": {
+        "operationId": "getJob",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportJob"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/documents": {
+      "get": {
+        "operationId": "listDocuments",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentList"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{id}": {
+      "get": {
+        "operationId": "getDocument",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentDetail"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/nodes": {
+      "post": {
+        "operationId": "createNode",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodeCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/nodes/{id}": {
+      "patch": {
+        "operationId": "updateNode",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodePatch"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteNode",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/collisions": {
+      "post": {
+        "operationId": "collide",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollisionResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollisionInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ideas/{id}/save": {
+      "post": {
+        "operationId": "saveIdea",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeaSaved"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "description": "Idempotent; repeated saves return the same node and edges.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tutor/questions": {
+      "post": {
+        "operationId": "createQuestion",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Question"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tutor/answers": {
+      "post": {
+        "operationId": "submitAnswer",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "400/401/404/409/413/429/502/503 error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Idempotent per questionId; mastery +10 or -5, clamped to 0–100.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerInput"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "ErrorDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "sessionToken": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "sessionToken"
+        ]
+      },
+      "SourceRef": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "chunkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "snippet": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "documentId",
+          "chunkId",
+          "page",
+          "snippet"
+        ]
+      },
+      "Node": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 1000
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "knowledge",
+              "idea"
+            ]
+          },
+          "mastery": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "sourceRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "summary",
+          "category",
+          "kind",
+          "mastery",
+          "sourceRefs",
+          "createdAt"
+        ]
+      },
+      "Edge": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "target",
+          "relation"
+        ]
+      },
+      "Graph": {
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Node"
+            }
+          },
+          "edges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Edge"
+            }
+          },
+          "graphVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "nodes",
+          "edges",
+          "graphVersion"
+        ]
+      },
+      "NodeCreate": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 1000
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "title",
+          "summary",
+          "category"
+        ]
+      },
+      "NodePatch": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 1000
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "required": [],
+        "minProperties": 1,
+        "additionalProperties": false
+      },
+      "NodeResult": {
+        "type": "object",
+        "properties": {
+          "node": {
+            "$ref": "#/components/schemas/Node"
+          }
+        },
+        "required": [
+          "node"
+        ]
+      },
+      "ImportJob": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "failed"
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          },
+          "graphVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "jobId",
+          "status"
+        ]
+      },
+      "DocumentSummary": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "documentId",
+          "title",
+          "createdAt",
+          "status"
+        ]
+      },
+      "DocumentList": {
+        "type": "object",
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentSummary"
+            }
+          }
+        },
+        "required": [
+          "documents"
+        ]
+      },
+      "Chunk": {
+        "type": "object",
+        "properties": {
+          "chunkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "chunkId",
+          "page",
+          "text"
+        ]
+      },
+      "DocumentDetail": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "chunks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Chunk"
+            }
+          }
+        },
+        "required": [
+          "documentId",
+          "title",
+          "createdAt",
+          "chunks"
+        ]
+      },
+      "CollisionInput": {
+        "type": "object",
+        "properties": {
+          "nodeIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "nodeIds"
+        ]
+      },
+      "CollisionResult": {
+        "type": "object",
+        "properties": {
+          "ideaId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "commonGround": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "sourceNodeIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "ideaId",
+          "commonGround",
+          "title",
+          "description",
+          "action",
+          "sourceNodeIds"
+        ]
+      },
+      "IdeaSaved": {
+        "type": "object",
+        "properties": {
+          "node": {
+            "$ref": "#/components/schemas/Node"
+          },
+          "edges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Edge"
+            }
+          }
+        },
+        "required": [
+          "node",
+          "edges"
+        ]
+      },
+      "QuestionInput": {
+        "type": "object",
+        "properties": {
+          "nodeId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "nodeId"
+        ]
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nodeId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "question": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionId",
+          "nodeId",
+          "question"
+        ]
+      },
+      "AnswerInput": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "answer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "questionId",
+          "answer"
+        ]
+      },
+      "AnswerResult": {
+        "type": "object",
+        "properties": {
+          "correct": {
+            "type": "boolean"
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "correctAnswer": {
+            "type": "string"
+          },
+          "mastery": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "reviewNodeIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "correct",
+          "feedback",
+          "correctAnswer",
+          "mastery",
+          "reviewNodeIds"
+        ]
+      }
+    }
+  }
+}
