@@ -24,6 +24,8 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
 
 配置见 `backend/.env.example`，需要把变量设到进程环境，服务不会自动读取 `.env`。默认 SQLite 数据库为 `backend/data/neuroverse.db`，迁移必须在启动前运行。只在 `APP_ENV=development` 时允许配置中的前端 Origin，生产同源。
 
+前后端本地联调时，`ALLOWED_ORIGINS` 要包含前端实际打开的来源；`localhost:5173` 与 `127.0.0.1:5173` 是两个不同的 Origin，示例配置同时列出两者。默认前端请求 `http://localhost:8000`，可用 `VITE_API_BASE_URL` 覆盖。
+
 按 `contracts/openapi.yaml` 向 `POST /api/v1/sessions` 发送 JSON `{}` 获取会话令牌，后续用 `Authorization: Bearer <sessionToken>` 认证。`GET /api/v1/graph` 返回该会话的图谱和版本。文件导入用 multipart `file` 或 `text`（二选一），轮询 `GET /api/v1/jobs/{id}`；成功后重新获取图谱。PDF 仅支持文本层，不做 OCR。上传资料前须明确告知用户选用的模型服务会接收文本，并确认资料可用于该处理。
 
 ## 配置真实模型与部署
