@@ -4,6 +4,8 @@ import type { Api, Graph } from '../types/api'
 import { NodePanel } from '../components/NodePanel'
 import { CollisionPanel } from '../components/CollisionPanel'
 
+import '../styles/universe.css'
+
 const GraphScene = lazy(() => import('../components/GraphScene').then(({ GraphScene }) => ({ default: GraphScene })))
 class SceneBoundary extends Component<{ children: ReactNode; onUnavailable: () => void }, { failed: boolean }> {
   state = { failed: false }
@@ -15,6 +17,7 @@ class SceneBoundary extends Component<{ children: ReactNode; onUnavailable: () =
 type Props = { api: Api; graph?: Graph; error?: string; loading: boolean; onRetry: () => void; onImport: () => void; onChanged: () => Promise<void>; demo: boolean }
 const motionQuery = '(prefers-reduced-motion: reduce)'
 export function UniversePage({ api, graph, error, loading, onRetry, onImport, onChanged, demo }: Props) {
+  const [indexOpen, setIndexOpen] = useState(true)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('')
   const [selection, setSelection] = useState<string | null>(null)
@@ -72,18 +75,21 @@ export function UniversePage({ api, graph, error, loading, onRetry, onImport, on
     } catch (error) { setAddError(error instanceof Error ? error.message : '无法新增星球。') }
     finally { setAddBusy(false) }
   }
-  return <div className="workspace-shell">
-    <div className="workspace-header"><div><div className="eyebrow">02 / KNOWLEDGE UNIVERSE</div><h1>三维知识宇宙</h1></div><div className="flex flex-wrap gap-2"><button className="btn" disabled={!graph} onClick={() => { setAdding(!adding); setAddError('') }}>新增星球</button><button className="btn btn-primary" onClick={onImport}>导入知识 ＋</button></div></div>
+  return <div className="universe-workspace">
+    <h1 className="sr-only">三维知识宇宙</h1>
+    <div className="universe-actions"><button className="btn" disabled={!graph} aria-expanded={adding} onClick={() => { setAdding(!adding); setAddError('') }}>新增星球</button><button className="btn btn-primary" onClick={onImport}>导入知识 ＋</button></div>
     {error && <div className="inline-alert" role="alert">{error}<button className="btn" onClick={onRetry}>重试</button></div>}
     {adding && <form className="panel add-form" onSubmit={addNode}><h2>新增星球</h2><label>标题<input className="field" name="title" maxLength={120} required autoFocus/></label><label>分类<input className="field" name="category" maxLength={80} required/></label><label>摘要<textarea className="field" name="summary" maxLength={1000}/></label><div className="flex gap-2"><button className="btn btn-primary" disabled={addBusy}>创建星球</button><button type="button" className="btn" onClick={() => setAdding(false)}>取消</button></div>{addError && <p className="error" role="alert">{addError}</p>}</form>}
-    <div className={`universe-grid${selected || collision ? ' has-detail' : ''}`}>
+    <div className={`universe-stage${selected || collision ? ' has-detail' : ''}`}>
       <aside className="panel graph-index" aria-label="星球索引">
-        <div className="eyebrow">SECTOR INDEX</div><h2>星球索引</h2>
+        <div className="index-heading"><div><div className="eyebrow">SECTOR INDEX</div><h2>星球索引</h2></div><button className="btn drawer-toggle" aria-controls="universe-index-body" aria-expanded={indexOpen} onClick={() => setIndexOpen(!indexOpen)}>{indexOpen ? '收起索引' : '展开索引'}</button></div>
+        <div id="universe-index-body" className={`index-body${indexOpen ? '' : ' is-folded'}`}>
         <label className="sr-only" htmlFor="graph-search">搜索星球</label><input id="graph-search" className="field" placeholder="搜索标题或摘要" value={query} onChange={(event) => setQuery(event.target.value)}/>
         <label className="sr-only" htmlFor="graph-category">知识分类</label><select id="graph-category" className="field" value={activeCategory} onChange={(event) => setCategory(event.target.value)}><option value="">全部分类</option>{categories.map((name) => <option key={name}>{name}</option>)}</select>
         <p className="eyebrow graph-count" aria-live="polite">{visible?.nodes.length ?? 0} 颗星球</p>
         <ul className="index-items">{visible?.nodes.map((node) => <li key={node.id}><button type="button" className="index-button" aria-pressed={collision ? picks.includes(node.id) : selected?.id === node.id} onClick={() => choose(node.id)}><i className={node.kind === 'idea' ? 'status-dot demo-dot' : 'status-dot'}/><span>{node.title}</span><small>{node.mastery}%</small></button></li>)}</ul>
         <button className="btn" aria-pressed={collision} disabled={!graph || graph.nodes.length < 2} onClick={() => collision ? closeCollision() : setCollision(true)}>✦ 思想碰撞</button>
+        </div>
       </aside>
       <section className="panel viewport" aria-label="宇宙视图">
         <div className="scene-overlay"><span className="eyebrow">{useList ? 'LIST VIEW' : 'ORBITAL VIEW'} / {demo ? '示例' : '实时'}</span><span className="eyebrow">{visible?.edges.length ?? 0} 条轨道</span></div>
